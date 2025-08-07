@@ -1,0 +1,15 @@
+[Unit]
+Description=Appointment Booking Backend API
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/path/to/your/app/backend
+ExecStart=/path/to/your/app/backend/venv/bin/python run.py
+Restart=always
+RestartSec=10
+Environment=DATABASE_URL=postgresql://user:password@localhost:5432/appointments
+
+[Install]
+WantedBy=multi-user.target
