@@ -13,7 +13,7 @@ app = FastAPI(title="Appointment Booking API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000"],  # Allows all origins, adjust as needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

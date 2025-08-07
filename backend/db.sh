@@ -2,7 +2,7 @@
 
 set -e
 
-DB_USER="user"
+DB_USER="appuser"
 DB_PASSWORD="password"
 DB_NAME="appointments"
 
@@ -17,13 +17,13 @@ BEGIN
    IF NOT EXISTS (
       SELECT FROM pg_catalog.pg_roles WHERE rolname = '${DB_USER}'
    ) THEN
-      CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASSWORD}';
+      CREATE ROLE "${DB_USER}" LOGIN PASSWORD '${DB_PASSWORD}';
    END IF;
 END
 \$\$;
 
-CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};
-GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO ${DB_USER};
+CREATE DATABASE "${DB_NAME}" OWNER "${DB_USER}";
+GRANT ALL PRIVILEGES ON DATABASE "${DB_NAME}" TO "${DB_USER}";
 EOF
 
 echo "[3/6] Configuring authentication method to md5..."

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Calendar, Clock, User, Phone, Mail, Trash2, CheckCircle, XCircle, Video } from 'lucide-react'
 
+
 interface Appointment {
   id: number
   name: string
@@ -34,7 +35,7 @@ export default function AdminPage() {
 
   const fetchAppointments = async () => {
     try {
-      const response = await fetch('http://localhost:8000/appointments/')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/appointments/`)
       const data = await response.json()
       setAppointments(data)
     } catch (error) {
@@ -48,7 +49,7 @@ export default function AdminPage() {
     if (!confirm('Are you sure you want to delete this appointment?')) return
     
     try {
-      await fetch(`http://localhost:8000/appointments/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/appointments/${id}`, {
         method: 'DELETE'
       })
       setAppointments(appointments.filter(apt => apt.id !== id))
@@ -59,7 +60,7 @@ export default function AdminPage() {
 
   const updateStatus = async (id: number, status: string) => {
     try {
-      await fetch(`http://localhost:8000/appointments/${id}/status?status=${status}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/appointments/${id}/status?status=${status}`, {
         method: 'PUT'
       })
       setAppointments(appointments.map(apt => 
