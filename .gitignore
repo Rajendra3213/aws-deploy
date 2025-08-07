@@ -69,3 +69,10 @@ Thumbs.db
 
 # Alembic
 backend/alembic/versions/*.pyc
+
+#terrafrom
+terraform.tfvars
+.terraform
+.terraform/*
+terraform.tfstate
+

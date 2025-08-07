@@ -1,0 +1,4 @@
+access_key = "access keys"
+secret_key = "secret keys"
+instance_type = "t2.micro"
+key_name = "my-key-pair"
