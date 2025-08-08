@@ -33,3 +33,10 @@ variable "tags" {
   type = string
   default = "ec2 test"
 }
+
+
+variable "security_group_name" {
+  description = "Name of the security group"
+  type        = string
+  default     = "ec2_security_group"
+}

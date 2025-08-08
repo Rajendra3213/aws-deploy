@@ -26,21 +26,18 @@ data "aws_ami" "latest_amazon_linux" {
   }
 }
 
-resource "aws_key_pair" "name" {
-    key_name   = var.key_name
-    public_key = file("~/.ssh/id_rsa.pub") # Adjust the path to your public key
-}
 
 resource "aws_instance" "scheduling_application" {
     ami =  data.aws_ami.latest_amazon_linux.id
     instance_type = var.instance_type
     key_name =  aws_key_pair.name.key_name
+    security_groups = [aws_security_group.name.name]
     tags = {
     Name = "HelloWorld"
   }
 }
 
-
+# Save the private key to a local file
 
 
 
