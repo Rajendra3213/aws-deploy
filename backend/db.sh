@@ -3,7 +3,7 @@
 set -e
 
 DB_USER="appuser"
-DB_PASSWORD="password"z
+DB_PASSWORD="password"
 DB_NAME="appointments"
 
 echo "[1/6] Updating system and installing PostgreSQL..."
