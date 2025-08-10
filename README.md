@@ -48,12 +48,398 @@
 - **Systemd Integration**: Linux service management
 - **Security**: Input validation, SQL injection protection
 
-## Getting Started
+## 🚀 AWS EC2 Deployment Guide
+
+### Prerequisites
+- AWS EC2 instance (Ubuntu 20.04 LTS or later)
+- Security Group allowing ports 22 (SSH), 80 (HTTP), 443 (HTTPS), 3000 (Frontend), 8001 (Backend)
+- Domain name (optional)
+
+### Step 1: Launch EC2 Instance
+
+1. **Launch EC2 Instance**:
+   - AMI: Ubuntu Server 20.04 LTS
+   - Instance Type: t3.medium (minimum)
+   - Storage: 20GB GP3
+   - Security Group: Allow SSH (22), HTTP (80), HTTPS (443), Custom TCP (3000, 8001)
+
+2. **Connect to Instance**:
+```bash
+ssh -i your-key.pem ubuntu@your-ec2-public-ip
+```
+
+### Step 2: System Setup
+
+1. **Update System**:
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+2. **Install Required Software**:
+```bash
+# Install Node.js 18.x
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install Python 3.9+
+sudo apt install -y python3 python3-pip python3-venv
+
+# Install PostgreSQL
+sudo apt install -y postgresql postgresql-contrib
+
+# Install Nginx (optional, for reverse proxy)
+sudo apt install -y nginx
+
+# Install Git
+sudo apt install -y git
+```
+
+### Step 3: Clone and Setup Project
+
+1. **Clone Repository**:
+```bash
+cd /home/ubuntu
+git clone <your-repo-url> appointment-booking
+cd appointment-booking
+```
+
+2. **Setup PostgreSQL Database**:
+```bash
+# Run the database setup script
+chmod +x db.sh
+./db.sh
+```
+
+### Step 4: Backend Setup
+
+1. **Navigate to Backend Directory**:
+```bash
+cd /home/ubuntu/appointment-booking/backend
+```
+
+2. **Create Python Virtual Environment**:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. **Install Dependencies**:
+```bash
+pip install -r requirements.txt
+```
+
+4. **Configure Environment**:
+```bash
+cp .env-example .env
+nano .env
+```
+
+Update `.env` with your settings:
+```env
+DATABASE_URL=postgresql://appuser:password@localhost:5432/appointments
+SECRET_KEY=your-super-secret-key-change-this-in-production
+```
+
+5. **Test Backend**:
+```bash
+python run.py
+```
+
+### Step 5: Frontend Setup
+
+1. **Navigate to Frontend Directory**:
+```bash
+cd /home/ubuntu/appointment-booking/frontend
+```
+
+2. **Install Dependencies**:
+```bash
+npm install
+```
+
+3. **Configure Environment**:
+```bash
+cp .env.local.example .env.local
+nano .env.local
+```
+
+Update `.env.local`:
+```env
+NEXT_PUBLIC_API_URL=http://your-ec2-public-ip:8001
+```
+
+4. **Build Frontend**:
+```bash
+npm run build
+```
+
+5. **Test Frontend**:
+```bash
+npm start
+```
+
+### Step 6: Create Systemd Services
+
+#### Backend Service
+
+1. **Create Backend Service File**:
+```bash
+sudo nano /etc/systemd/system/appointment-backend.service
+```
+
+2. **Add Backend Service Configuration**:
+```ini
+[Unit]
+Description=Appointment Booking Backend API
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/appointment-booking/backend
+Environment=PATH=/home/ubuntu/appointment-booking/backend/venv/bin
+ExecStart=/home/ubuntu/appointment-booking/backend/venv/bin/python run.py
+Restart=always
+RestartSec=10
+
+# Environment variables
+Environment=DATABASE_URL=postgresql://appuser:password@localhost:5432/appointments
+Environment=SECRET_KEY=your-super-secret-key-change-this-in-production
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/home/ubuntu/appointment-booking/backend
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Frontend Service
+
+1. **Create Frontend Service File**:
+```bash
+sudo nano /etc/systemd/system/appointment-frontend.service
+```
+
+2. **Add Frontend Service Configuration**:
+```ini
+[Unit]
+Description=Appointment Booking Frontend
+After=network.target appointment-backend.service
+Requires=appointment-backend.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/appointment-booking/frontend
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+
+# Environment variables
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=NEXT_PUBLIC_API_URL=http://localhost:8001
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/home/ubuntu/appointment-booking/frontend
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Step 7: Enable and Start Services
+
+1. **Reload Systemd and Enable Services**:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable appointment-backend
+sudo systemctl enable appointment-frontend
+```
+
+2. **Start Services**:
+```bash
+sudo systemctl start appointment-backend
+sudo systemctl start appointment-frontend
+```
+
+3. **Check Service Status**:
+```bash
+sudo systemctl status appointment-backend
+sudo systemctl status appointment-frontend
+```
+
+4. **View Logs** (if needed):
+```bash
+sudo journalctl -u appointment-backend -f
+sudo journalctl -u appointment-frontend -f
+```
+
+### Step 8: Configure Nginx (Optional)
+
+1. **Create Nginx Configuration**:
+```bash
+sudo nano /etc/nginx/sites-available/appointment-booking
+```
+
+2. **Add Nginx Configuration**:
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;
+
+    # Frontend
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Backend API
+    location /api/ {
+        proxy_pass http://localhost:8001/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+3. **Enable Site and Restart Nginx**:
+```bash
+sudo ln -s /etc/nginx/sites-available/appointment-booking /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+### Step 9: SSL Certificate (Optional)
+
+1. **Install Certbot**:
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+```
+
+2. **Obtain SSL Certificate**:
+```bash
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+```
+
+### Step 10: Firewall Configuration
+
+1. **Configure UFW**:
+```bash
+sudo ufw allow ssh
+sudo ufw allow 'Nginx Full'
+sudo ufw allow 3000
+sudo ufw allow 8001
+sudo ufw --force enable
+```
+
+### Step 11: Monitoring and Maintenance
+
+1. **Service Management Commands**:
+```bash
+# Restart services
+sudo systemctl restart appointment-backend
+sudo systemctl restart appointment-frontend
+
+# Stop services
+sudo systemctl stop appointment-backend
+sudo systemctl stop appointment-frontend
+
+# View logs
+sudo journalctl -u appointment-backend --since "1 hour ago"
+sudo journalctl -u appointment-frontend --since "1 hour ago"
+
+# Check service status
+sudo systemctl status appointment-backend appointment-frontend
+```
+
+2. **Database Backup Script**:
+```bash
+#!/bin/bash
+# Create backup script
+sudo nano /home/ubuntu/backup-db.sh
+```
+
+Add to backup script:
+```bash
+#!/bin/bash
+BACKUP_DIR="/home/ubuntu/backups"
+DATE=$(date +"%Y%m%d_%H%M%S")
+mkdir -p $BACKUP_DIR
+
+pg_dump -U appuser -h localhost appointments > $BACKUP_DIR/appointments_$DATE.sql
+
+# Keep only last 7 days of backups
+find $BACKUP_DIR -name "appointments_*.sql" -mtime +7 -delete
+```
+
+Make executable and add to crontab:
+```bash
+chmod +x /home/ubuntu/backup-db.sh
+crontab -e
+# Add: 0 2 * * * /home/ubuntu/backup-db.sh
+```
+
+### 🎯 Access Your Application
+
+- **Frontend**: `http://your-ec2-public-ip:3000`
+- **Backend API**: `http://your-ec2-public-ip:8001`
+- **Admin Panel**: `http://your-ec2-public-ip:3000/admin/login`
+
+### 🔧 Troubleshooting
+
+1. **Check if services are running**:
+```bash
+sudo systemctl status appointment-backend appointment-frontend
+```
+
+2. **Check logs for errors**:
+```bash
+sudo journalctl -u appointment-backend -n 50
+sudo journalctl -u appointment-frontend -n 50
+```
+
+3. **Test database connection**:
+```bash
+psql -U appuser -d appointments -h localhost
+```
+
+4. **Check port availability**:
+```bash
+sudo netstat -tlnp | grep :3000
+sudo netstat -tlnp | grep :8001
+```
+
+## Local Development Setup
 
 ### Frontend Setup
 
 1. Install dependencies:
 ```bash
+cd frontend
 npm install
 ```
 
@@ -68,95 +454,34 @@ npm run dev
 
 1. Install PostgreSQL and create database:
 ```bash
-sudo apt install postgresql postgresql-contrib
-sudo -u postgres createdb appointments
+./db.sh
 ```
 
-2. Update database credentials in `backend/.env`
-
-3. Run database migration (for existing databases):
+2. Setup backend:
 ```bash
 cd backend
-python migrate.py
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env-example .env
+# Update .env with your database credentials
+python run.py
 ```
 
-4. Start the backend:
+3. Backend API runs on [http://localhost:8001](http://localhost:8001)
+
+### Alternative Deployment Options
+
+#### Docker Deployment
 ```bash
-cd backend
-./start.sh
+docker-compose up -d
 ```
 
-5. Backend API runs on [http://localhost:8000](http://localhost:8000)
-
-## Production Build
-
-1. Build for production:
-```bash
-npm run build
-```
-
-2. Start production server:
-```bash
-npm start
-```
-
-3. Production server runs on [http://localhost:3000](http://localhost:3000)
-
-## Deployment
-
-### Linux Server with Systemd
-
-1. Build and prepare:
-```bash
-npm run build
-npm start
-```
-
-2. Create systemd service file:
-```bash
-sudo nano /etc/systemd/system/appointment-booking.service
-```
-
-3. Add service configuration:
-```ini
-[Unit]
-Description=Appointment Booking App
-After=network.target
-
-[Service]
-Type=simple
-User=ubuntu
-WorkingDirectory=/path/to/your/app
-ExecStart=/usr/bin/npm start
-Restart=always
-RestartSec=10
-Environment=NODE_ENV=production
-Environment=PORT=3000
-
-[Install]
-WantedBy=multi-user.target
-```
-
-4. Enable and start service:
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable appointment-booking
-sudo systemctl start appointment-booking
-sudo systemctl status appointment-booking
-```
-
-### Other Platforms
-
-#### Vercel
+#### Vercel (Frontend Only)
 ```bash
 npm i -g vercel
+cd frontend
 vercel
-```
-
-#### Docker
-```bash
-docker build -t appointment-booking .
-docker run -p 3000:3000 appointment-booking
 ```
 
 ## 🎨 Customization Guide
