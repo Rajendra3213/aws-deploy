@@ -210,9 +210,9 @@ Environment=SECRET_KEY=your-super-secret-key-change-this-in-production
 
 # Security settings
 NoNewPrivileges=yes
-PrivateTmp=yes
-ProtectSystem=strict
-ProtectHome=yes
+#PrivateTmp=yes
+#ProtectSystem=strict
+#ProtectHome=yes
 ReadWritePaths=/home/ubuntu/appointment-booking/backend
 
 [Install]
@@ -249,9 +249,9 @@ Environment=NEXT_PUBLIC_API_URL=http://localhost:8001
 
 # Security settings
 NoNewPrivileges=yes
-PrivateTmp=yes
-ProtectSystem=strict
-ProtectHome=yes
+#PrivateTmp=yes
+#ProtectSystem=strict
+#ProtectHome=yes
 ReadWritePaths=/home/ubuntu/appointment-booking/frontend
 
 [Install]
