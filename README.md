@@ -1,4 +1,4 @@
-# 🗓️ Professional Appointment Booking System
+# Professional Appointment Booking System
 
 **A complete, production-ready appointment booking solution perfect for businesses, consultants, and service providers.**
 
@@ -7,12 +7,12 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-green)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)](https://postgresql.org/)
 
-## 🚀 Live Demo
+## Live Demo
 - **Booking Page**: [Your Domain](https://yourdomain.com)
 - **Admin Login**: [Your Domain/admin/login](https://yourdomain.com/admin/login)
 - **Default Admin**: username: `admin`, password: `admin123`
 
-## 🔐 Login Information
+## Login Information
 
 ### For Customers
 - **No login required** - Direct booking access
@@ -22,25 +22,25 @@
 - **Admin Login**: `/admin/login`
 - **Username**: `admin`
 - **Password**: `admin123`
-- **⚠️ Change credentials in production!**
+- **WARNING: Change credentials in production!**
 
-## ✨ Key Features
+## Key Features
 
-### 🎯 Customer Features
+### Customer Features
 - **Smart Booking**: Intuitive date/time selection with availability checking
 - **Mobile-First**: Optimized for Instagram bio links and mobile users
 - **Form Validation**: Real-time email, phone, and input validation
 - **Instant Confirmation**: Immediate booking confirmation with details
 - **Professional Design**: Modern UI that builds trust and credibility
 
-### 👨‍💼 Admin Features
+### Admin Features
 - **Secure Dashboard**: Password-protected admin panel
 - **Appointment Management**: View, confirm, cancel, and delete bookings
 - **Real-time Updates**: Live status changes and notifications
 - **Client Information**: Complete contact details and service history
 - **Status Tracking**: Visual indicators for appointment states
 
-### 🛠️ Technical Features
+### Technical Features
 - **Production Ready**: Fully configured for deployment
 - **Database Persistence**: PostgreSQL for reliable data storage
 - **RESTful API**: FastAPI backend with automatic documentation
@@ -48,7 +48,7 @@
 - **Systemd Integration**: Linux service management
 - **Security**: Input validation, SQL injection protection
 
-## 🚀 AWS EC2 Deployment Guide
+## AWS EC2 Deployment Guide
 
 ### Prerequisites
 - AWS EC2 instance (Ubuntu 20.04 LTS or later)
@@ -403,13 +403,13 @@ crontab -e
 # Add: 0 2 * * * /home/ubuntu/backup-db.sh
 ```
 
-### 🎯 Access Your Application
+### Access Your Application
 
 - **Frontend**: `http://your-ec2-public-ip:3000`
 - **Backend API**: `http://your-ec2-public-ip:8001`
 - **Admin Panel**: `http://your-ec2-public-ip:3000/admin/login`
 
-### 🔧 Troubleshooting
+### Troubleshooting
 
 1. **Check if services are running**:
 ```bash
@@ -484,9 +484,9 @@ cd frontend
 vercel
 ```
 
-## 🎨 Customization Guide
+## Customization Guide
 
-### 🎨 Branding
+### Branding
 ```javascript
 // tailwind.config.js - Update brand colors
 colors: {
@@ -495,7 +495,7 @@ colors: {
 }
 ```
 
-### 💼 Services Configuration
+### Services Configuration
 ```javascript
 // app/page.tsx - Update service offerings
 const services = [
@@ -506,7 +506,7 @@ const services = [
 ]
 ```
 
-### ⏰ Time Slots
+### Time Slots
 ```javascript
 // app/page.tsx - Customize available times
 const timeSlots = [
@@ -515,15 +515,15 @@ const timeSlots = [
 ]
 ```
 
-### 📞 Contact Information
+### Contact Information
 ```javascript
 // Update in app/page.tsx
 <p>Need help? Contact us at your@email.com</p>
 ```
 
-## 💰 Perfect for Business
+## Perfect for Business
 
-### 🎯 Target Users
+### Target Users
 - **Consultants & Coaches**: Personal sessions and consultations
 - **Beauty & Wellness**: Salons, spas, massage therapists
 - **Healthcare**: Doctors, dentists, therapists
@@ -531,24 +531,24 @@ const timeSlots = [
 - **Fitness**: Personal trainers, yoga instructors
 - **Creative Services**: Photographers, designers
 
-### 📱 Instagram Bio Optimization
+### Instagram Bio Optimization
 - Lightning-fast mobile loading
 - One-click booking process
 - Professional brand appearance
 - Direct link sharing capability
 - Mobile-first responsive design
 
-## 💵 Commercial License
+## Commercial License
 
 **This software is available for commercial use under the MIT License.**
 
-- ✅ Use for client projects
-- ✅ Sell as a service
-- ✅ White-label solutions
-- ✅ Modify and redistribute
-- ✅ No attribution required
+- Use for client projects
+- Sell as a service
+- White-label solutions
+- Modify and redistribute
+- No attribution required
 
-## 🔒 Security Features
+## Security Features
 
 - **Admin Authentication**: Secure login system
 - **Input Validation**: Server-side data validation
@@ -556,7 +556,7 @@ const timeSlots = [
 - **CORS Configuration**: Controlled cross-origin requests
 - **Environment Variables**: Secure credential management
 
-## 📊 Performance
+## Performance
 
 - **Next.js Optimization**: Automatic code splitting and optimization
 - **Database Indexing**: Optimized PostgreSQL queries
